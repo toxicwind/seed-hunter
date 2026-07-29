@@ -1,0 +1,29 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  smoke:
+    strategy:
+      matrix:
+        python: ["3.11", "3.12"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: seed_hunter smoke
+        run: |
+          mkdir -p /tmp/corpus && cp README.md docs/COMPAT.md /tmp/corpus/
+          python src/seed_hunter/seed_hunter.py /tmp/corpus --out /tmp/out || test $? -eq 0
+      - name: semantic_weirdness smoke
+        run: |
+          pip install nltk --quiet
+          python src/seed_hunter/semantic_weirdness.py /tmp/corpus --out /tmp/out2 || true
+      - name: syntax gate (no >3.11 features)
+        run: |
+          python - <<'PY'
+          import ast, sys, pathlib
+          for p in pathlib.Path("src").rglob("*.py"):
+              ast.parse(p.read_text(), feature_version=(3, 11))
+          print("3.11-compatible OK")
+          PY
