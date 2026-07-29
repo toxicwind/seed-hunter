@@ -10,7 +10,7 @@ v2 lessons from v1 output:
     cap, so recurrence measures independent sightings, not line noise.
   * filter noise shapes: unicode escapes (u0026), base64 fragments (AAC7B),
     sourcemap/bundle dirs, CDN/WAF header names.
-  * optional --nlp: embed top seeds via the gateway's nlp_embedding and
+  * optional nlp_cluster.py: embed top seeds via any OpenAI-compatible endpoint and
     cluster by cosine similarity (semantic seed families).
 """
 import json, math, os, re, sys, csv
